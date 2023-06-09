@@ -48,6 +48,7 @@ public class ProductController {
     }
 
     @GetMapping("/list")
+    @PreAuthorize("isAnonymous() or hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     public ResponseEntity<List<ProductResponseDTO>> getAllProduct() {
         List<ProductResponseDTO> productResponseDTOS = productService.allProduct();
         return ResponseEntity.status(HttpStatus.OK).body(productResponseDTOS);
