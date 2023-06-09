@@ -32,7 +32,11 @@ public class ProductController {
     }
     @PostMapping() //상품 등록 어드민만
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<ProductResponseDTO> createProduct(@RequestParam String name, @RequestParam int price, @RequestParam int stock) {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setName(name);
+        productDTO.setPrice(price);
+        productDTO.setStock(stock);
         ProductResponseDTO productResponseDTO = productService.createProduct(productDTO);
         return ResponseEntity.status(HttpStatus.OK).body(productResponseDTO);
     }
