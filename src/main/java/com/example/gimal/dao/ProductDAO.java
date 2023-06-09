@@ -8,6 +8,7 @@ public interface ProductDAO {
     Product selectProduct(Long id);
     Product insertProduct(Product product);
     Product updateUserNamePRiceStock(Long number, String name, int price, int stock) throws Exception;
+    Product updateProductStock(Long number, int stock) throws Exception;
 
     void deleteProduct(Long number) throws Exception;
 

@@ -8,6 +8,7 @@ import com.example.gimal.dto.response.BoardResponseDTO;
 import com.example.gimal.dto.response.OrderResponseDTO;
 import com.example.gimal.dto.response.ProductResponseDTO;
 import com.example.gimal.dto.response.UserResponseDTO;
+import com.example.gimal.repository.ProductRepository;
 import com.example.gimal.service.BoardService;
 import com.example.gimal.service.OrderService;
 import com.example.gimal.service.ProductService;
@@ -27,28 +28,37 @@ public class OrderController {
 
     private final OrderService orderService;
     private final UserService userService;
+    private final ProductService productService;
     private final JwtTokenProvider jwtTokenProvider;
     @Autowired
-    public OrderController(OrderService orderService, JwtTokenProvider jwtTokenProvider, UserService userService) {
+    public OrderController(OrderService orderService, JwtTokenProvider jwtTokenProvider, UserService userService, ProductService productService) {
         this.orderService = orderService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
+        this.productService = productService;
     }
 
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<OrderResponseDTO> createOrder(HttpServletRequest request, @RequestParam Long productId,
-        @RequestParam String productName, @RequestParam int price) {
+        @RequestParam String productName) throws Exception {
         String id = jwtTokenProvider.getUsername(request.getHeader("X-AUTH-TOKEN"));
         UserResponseDTO userResponseDTO = userService.getUserById(id);
-        OrderDTO newOrder = new OrderDTO();
-        newOrder.setProductId(productId);
-        newOrder.setProductName(productName);
-        newOrder.setUserId(userResponseDTO.getUid());
-        newOrder.setUserName(userResponseDTO.getName());
-        newOrder.setPrice(price);
-        OrderResponseDTO orderResponseDTO = orderService.createOrder(newOrder);
-        return ResponseEntity.status(HttpStatus.OK).body(orderResponseDTO);
+        ProductResponseDTO productResponseDTO = productService.getOneProduct(productId);
+        if(productResponseDTO.getStock() == 0) {
+            return null;
+        } else {
+            OrderDTO newOrder = new OrderDTO();
+            newOrder.setProductId(productId);
+            newOrder.setProductName(productName);
+            newOrder.setUserId(userResponseDTO.getUid());
+            newOrder.setUserName(userResponseDTO.getName());
+            newOrder.setPrice(productResponseDTO.getPrice());
+            OrderResponseDTO orderResponseDTO = orderService.createOrder(newOrder);
+            productService.changeProductStock(productResponseDTO.getNumber(), productResponseDTO.getStock());
+
+            return ResponseEntity.status(HttpStatus.OK).body(orderResponseDTO);
+        }
     }
     @GetMapping("/list")
     @PreAuthorize("hasRole('ROLE_ADMIN')")

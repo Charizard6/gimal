@@ -10,6 +10,7 @@ public interface ProductService {
     ProductResponseDTO createProduct(ProductDTO productDTO);
     ProductResponseDTO changeProductNamePriceStock(Long number, String name, int price, int stock) throws Exception;
 
+    ProductResponseDTO changeProductStock(Long number, int stock) throws Exception;
     void deleteProduct(Long number) throws Exception;
 
     List<ProductResponseDTO> allProductOrderByPriceDESC();

@@ -61,6 +61,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductResponseDTO changeProductStock(Long number, int stock) throws Exception {
+        Product changeproduct = productDAO.updateProductStock(number, stock);
+        return new ProductResponseDTO(changeproduct);
+    }
+
+    @Override
     public void deleteProduct(Long number) throws Exception {
         productDAO.deleteProduct(number);
     }
